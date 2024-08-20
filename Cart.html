@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <style>
+        body {
+            background : url(cakeBackground.jpg);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .cart-container {
+            max-width: 100%;
+            margin: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .cart-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        .cart-item img {
+            height: 80px;
+            width: 80px;
+            border-radius: 8px;
+        }
+        .cart-item .details {
+            text-align: center;
+            margin: 10px 0;
+        }
+        .cart-item .details span {
+            display: block;
+            font-size: 16px;
+            color: #333;
+        }
+        .cart-item .quantity-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .cart-item .quantity-controls button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .cart-item .quantity-controls button:hover {
+            background-color: #0056b3;
+        }
+        .cart-item .quantity-controls button.remove {
+            background-color: #dc3545;
+        }
+        .cart-item .quantity-controls button.remove:hover {
+            background-color: #c82333;
+        }
+        .cart-item input {
+            width: 60px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        #totalAmountContainer {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        #confirmButton {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        #shopMoreButton{
+            display: none;
+            width: 100%;
+            padding: 15px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        #confirmButton:hover {
+            background-color: #218838;
+        }
+        .back-button {
+            margin-top: 10px;
+            margin-left: 20px;
+            cursor: pointer;
+            position: fixed;
+            z-index: 2;
+            display: block;
+        }
+        .back-button img {
+            height: 40px;
+            width: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="back-button" onclick="goToMenu()">
+            <img src="backImage.jpg" alt="Back"> <!-- Replace with your actual back button image file name -->
+        </div>
+
+    <div class="cart-container">
+        
+        <div id="cartItemsContainer"></div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;" >
+        <div id="appliedCouponDiv" style=" color: darkgreen;">
+            
+        </div>
+        <div id="removeDiscountButton" style="width: 80px; height: 35px; border-radius: 7px; background-color: red; display: flex; align-items: center; justify-content: center; cursor: pointer; display: none;">
+            <p style="margin: 0; font-size: 16px; color: white;">Remove</p>
+        </div>
+    </div>
+        <div class="discountcouponDiv" style="display: flex; align-items: center; justify-content: space-between;">
+            
+            <select style="height: 40px; width: 200px; font-size: 18px; margin-right: 10px; border-radius: 7px;" id="couponInput" placeholder="coupon Code">
+            <option>FLAT100OFF</option>
+            <option>FLAT101OFF</option>
+            <option>FLAT102OFF</option>
+            <option>FLAT103OFF</option>
+         </select>
+         <div id="discountButton" style="width: 80px; height: 35px; border-radius: 7px; background-color: green; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+            <p style="margin: 0; font-size: 16px; color: white;">APPLY</p>
+        </div>
+        
+        
+        
+        
+        </div>
+        <div id="totalAmountContainer"></div> <!-- Total amount section -->
+        <button id="confirmButton" onclick="confirmOrder()">Confirm Order</button>
+        <button id="shopMoreButton" onclick="goToMenu()">Shop More!!</button>
+    </div>
+
+
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getFirestore, collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc,writeBatch } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const queryParams = new URLSearchParams(window.location.search);
+        const mobile = queryParams.get('mobile');
+
+        async function loadCartItems() {
+    const cartRef = collection(db, 'users', mobile, 'cart');
+    const querySnapshot = await getDocs(cartRef);
+    const cartItemsContainer = document.getElementById('cartItemsContainer');
+    cartItemsContainer.innerHTML = '';
+
+    let totalAmount = 0;
+
+    querySnapshot.forEach(doc => {
+        const item = doc.data();
+        totalAmount += item.itemPrice * item.quantity;
+        const itemElement = document.createElement('div');
+        itemElement.className = 'cart-item';
+        itemElement.innerHTML = `
+            <img src="${item.itemImage}" alt="${item.itemName}">
+            <div class="details">
+                <span>${item.itemName}</span>
+                <span>Rs. ${item.itemPrice}</span>
+            </div>
+            <div class="quantity-controls">
+                <button onclick="changeQuantity('${doc.id}', -1)">-</button>
+                <input type="number" value="${item.quantity}" min="1" readonly>
+                <button onclick="changeQuantity('${doc.id}', 1)">+</button>
+                <button class="remove" onclick="removeItem('${doc.id}')">Remove</button>
+            </div>
+        `;
+        cartItemsContainer.appendChild(itemElement);
+        
+    });
+
+    // Display total amount
+    document.getElementById('totalAmountContainer').innerText = `Total Amount: Rs. ${totalAmount}`;
+
+    // Handle coupon functionality
+    const discountButton = document.getElementById('discountButton');
+    const removeDiscountButton = document.getElementById('removeDiscountButton');
+    const appliedCouponDiv = document.getElementById('appliedCouponDiv');
+    const couponInputDiv = document.getElementById('couponInput');
+
+    // Ensure previous event listeners are removed
+    discountButton.removeEventListener('click', applyCoupon);
+    removeDiscountButton.removeEventListener('click', removeCoupon);
+
+    // Add the apply coupon functionality
+    function applyCoupon() {
+        const couponInput = couponInputDiv.value;
+        appliedCouponDiv.innerHTML = ''; // Clear any previous content
+
+        let discount = 0;
+
+        // Coupon validation and discount calculation
+        if (couponInput === "FLAT100OFF") {
+            discount = 100;
+        } else if (couponInput === "FLAT101OFF") {
+            discount = 101;
+        } else if (couponInput === "FLAT102OFF") {
+            discount = 102;
+        } else if (couponInput === "FLAT103OFF") {
+            discount = 103;
+        }
+
+        totalAmount -= discount;
+        document.getElementById('totalAmountContainer').innerText = `Total Amount: Rs. ${totalAmount} `;
+
+        // Display applied coupon and remove button
+        const appliedCouponText = document.createElement('span');
+        appliedCouponText.textContent = `Coupon Applied: ${couponInput}`;
+        
+        appliedCouponDiv.appendChild(appliedCouponText);
+
+        // Toggle buttons and hide the coupon input
+        discountButton.style.display = 'none';
+        removeDiscountButton.style.display = 'flex';
+        couponInputDiv.style.display = 'none';
+    }
+
+    // Add the remove coupon functionality
+    function removeCoupon() {
+        const couponInput = couponInputDiv.value;
+        let discount = 0;
+
+        // Coupon validation and discount calculation
+        if (couponInput === "FLAT100OFF") {
+            discount = 100;
+        } else if (couponInput === "FLAT101OFF") {
+            discount = 101;
+        } else if (couponInput === "FLAT102OFF") {
+            discount = 102;
+        } else if (couponInput === "FLAT103OFF") {
+            discount = 103;
+        }
+
+        totalAmount += discount;
+        document.getElementById('totalAmountContainer').innerText = `Total Amount: Rs. ${totalAmount}`;
+        appliedCouponDiv.innerHTML = ''; // Clear coupon display
+
+        // Toggle buttons and show the coupon input
+        discountButton.style.display = 'flex';
+        removeDiscountButton.style.display = 'none';
+        couponInputDiv.style.display = 'inline';
+    }
+
+    discountButton.addEventListener('click', applyCoupon);
+    removeDiscountButton.addEventListener('click', removeCoupon);
+
+    // Set the total amount on the confirm button
+    const confirmButton = document.getElementById('confirmButton');
+    confirmButton.setAttribute('data-total', totalAmount);
+    
+    
+    if(totalAmount === 0){
+            document.getElementById('discountButton').style.display = 'none';
+            couponInputDiv.style.display = 'none';
+            document.getElementById('appliedCouponDiv').innerHTML = '';
+            cartItemsContainer.innerHTML = '<p style="color: red; font-size: 20px; margin-top: 20px; margin-left:30% ; ">Cart is empty</p>';
+            document.getElementById('confirmButton').style.display = 'none';
+            document.getElementById("shopMoreButton").style.display = 'block';
+        }
+}
+
+
+
+
+
+async function changeQuantity(itemId, change) {
+    try {
+        const itemRef = doc(db, 'users', mobile, 'cart', itemId);
+        const itemSnap = await getDoc(itemRef);
+
+        if (itemSnap.exists()) {
+            const itemData = itemSnap.data();
+            const currentQuantity = itemData.quantity;
+            const newQuantity = Math.max(parseInt(currentQuantity) + change, 1);
+
+            if (newQuantity > 0) {
+                await updateDoc(itemRef, { quantity: newQuantity });
+            } else {
+                await deleteDoc(itemRef);
+            }
+
+            console.log('Quantity changed for item:', itemId, 'New quantity:', newQuantity);
+            loadCartItems();
+        }
+    } catch (error) {
+        console.error('Error changing quantity:', error.message);
+        alert('There was an issue updating the quantity. Please try again.');
+    }
+}
+
+async function removeItem(itemId) {
+    try {
+        const itemRef = doc(db, 'users', mobile, 'cart', itemId);
+        await deleteDoc(itemRef);
+        loadCartItems();
+        console.log('Item removed:', itemId);
+    } catch (error) {
+        console.error('Error removing item:', error.message);
+        alert('There was an issue removing the item. Please try again.');
+    }
+}
+
+async function confirmOrder() {
+    try {
+        const totalAmount = document.getElementById('confirmButton').getAttribute('data-total');
+        if (!totalAmount || totalAmount <= 0) {
+            alert('Error: No items in cart.');
+            return;
+        }
+
+        const cartRef = collection(db, 'users', mobile, 'cart');
+        const querySnapshot = await getDocs(cartRef);
+        const orderItems = [];
+
+        querySnapshot.forEach(doc => {
+            const item = doc.data();
+            orderItems.push(item);
+        });
+
+        const ordersRef = collection(db, 'users', mobile, 'orders');
+        await addDoc(ordersRef, {
+            order: orderItems,
+            totalAmount: totalAmount,
+            status: 'Pending',
+            timestamp: new Date(),
+            referralPhoneNumber: '1234567890', 
+            userMobileNumber: mobile
+        });
+
+        const referralRef = doc(db, 'users', mobile);
+        const userSnap = await getDoc(referralRef);
+
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            const referralAmount = (userData.referralAmount || 0) + (0.10 * totalAmount);
+
+            await updateDoc(referralRef, {
+                referralAmount: referralAmount
+            });
+        }
+
+        const batch = writeBatch(db);
+        querySnapshot.forEach(doc => {
+            const itemRef = doc.ref;
+            batch.delete(itemRef);
+        });
+        await batch.commit();
+
+        console.log('Order confirmed:', totalAmount);
+        window.location.href = 'myOrders.html?mobile=' + mobile;
+
+    } catch (error) {
+        console.error('Error confirming order:', error.message);
+        alert('There was an issue confirming your order. Please try again.');
+    }
+}
+
+function goToMenu() {
+    window.location.href = 'login.html?mobile=' + mobile;
+}
+
+
+
+window.onload = loadCartItems;
+
+window.confirmOrder = confirmOrder;
+window.removeItem = removeItem;
+window.changeQuantity = changeQuantity;
+window.goToMenu = goToMenu;
+
+    </script>
+</body>
+</html>
