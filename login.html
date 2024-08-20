@@ -188,9 +188,7 @@
             margin-top: 5px;
             width: 105px;
         }
-        .menu-item button:hover {
-            background-color: darkgreen;
-        }
+        
         .quantity-controls {
             display: flex;
             justify-content: center;
@@ -199,8 +197,9 @@
             visibility: hidden;
             display: none;
         }
-        .quantity-controls button {
-            background-color: #ccc;
+        
+        .quantity-controls .quantityControlButtonAdd {
+            background-color: green;
             border: none;
             padding: 5px;
             cursor: pointer;
@@ -212,9 +211,24 @@
             justify-content: center;
             margin: 0 5px;
         }
-        .quantity-controls button:hover {
-            background-color: #bbb;
+
+        .quantity-controls .quantityControlButtonSub {
+            background-color: red;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
         }
+
+
+        
+        
         .quantity-controls input {
             width: 40px;
             padding: 5px;
@@ -641,9 +655,9 @@
                 <span>Cake 1 Pound</span>
                 <span style="color: green;">Rs.280</span>
                 <div id="quantity-controls1" class="quantity-controls">
-                    <button onclick="decreaseQuantity('quantity1')">-</button>
+                    <button class="quantityControlButtonSub" onclick="decreaseQuantity('quantity1')">-</button>
                     <input type="number" id="quantity1" value="1" min="1">
-                    <button onclick="increaseQuantity('quantity1')">+</button>
+                    <button class="quantityControlButtonAdd" onclick="increaseQuantity('quantity1')">+</button>
                 </div>
                 <button onclick="handleAddToCart('Cake 1 Pound', 280, 'cake1.jpeg', 'quantity1')" id="add-to-cart1">Add to Cart</button>  <div id="message1" class="message hidden">Item added to cart</div>
             </div>
@@ -656,9 +670,9 @@
                 <span>Cake 2 Pounds</span>
                 <span style="color: green;">Rs.560</span>
                 <div id="quantity-controls2" class="quantity-controls">
-                    <button onclick="decreaseQuantity('quantity2')">-</button>
+                    <button class="quantityControlButtonSub" onclick="decreaseQuantity('quantity2')">-</button>
                     <input type="number" id="quantity2" value="1" min="1">
-                    <button onclick="increaseQuantity('quantity2')">+</button>
+                    <button class="quantityControlButtonAdd" onclick="increaseQuantity('quantity2')">+</button>
                 </div>
                 <button onclick="handleAddToCart('Cake 2 Pounds', 560, 'cake2.jpeg', 'quantity2')" id="add-to-cart2">Add to Cart</button> <div id="message2" class="message hidden">Item added to cart</div>
             </div>
@@ -672,9 +686,9 @@
                 <span>Cake 3 Pounds</span>
                 <span style="color: green;">Rs.840</span>
                 <div id="quantity-controls3" class="quantity-controls">
-                    <button onclick="decreaseQuantity('quantity3')">-</button>
+                    <button class="quantityControlButtonSub" onclick="decreaseQuantity('quantity3')">-</button>
                     <input type="number" id="quantity3" value="1" min="1">
-                    <button onclick="increaseQuantity('quantity3')">+</button>
+                    <button class="quantityControlButtonAdd" onclick="increaseQuantity('quantity3')">+</button>
                 </div>
                 <button onclick="handleAddToCart('Cake 3 Pounds', 840, 'cake3.jpeg', 'quantity3')" id="add-to-cart3">Add to Cart</button> <div id="message3" class="message hidden">Item added to cart</div>
             </div>
@@ -687,9 +701,9 @@
                 <span>Cake 4 Pounds</span>
                 <span style="color: green;">Rs.1120</span>
                 <div id="quantity-controls4" class="quantity-controls">
-                    <button onclick="decreaseQuantity('quantity4')">-</button>
+                    <button class="quantityControlButtonSub" onclick="decreaseQuantity('quantity4')">-</button>
                     <input type="number" id="quantity4" value="1" min="1">
-                    <button onclick="increaseQuantity('quantity4')">+</button>
+                    <button class="quantityControlButtonAdd" onclick="increaseQuantity('quantity4')">+</button>
                 </div>
                 <button onclick="handleAddToCart('Cake 4 Pounds', 1120, 'cake4.jpeg', 'quantity4')" id="add-to-cart4">Add to Cart</button>  <div id="message4" class="message hidden">Item added to cart</div>
             </div>
